@@ -2,7 +2,6 @@ import numpy as np
 from pydub import AudioSegment
 from pydub.playback import play
 from pydub.effects import normalize, compress_dynamic_range
-import random
 
 # Custom function to generate a sine wave sound using numpy
 def generate_sine_wave(frequency, duration, sample_rate=44100, amplitude=0.5):
@@ -27,29 +26,29 @@ def apply_distortion(sound, gain=20, mix=0.8):
     return sound.overlay(distorted, gain_during_overlay=mix)
 
 # Load drum samples (provide the correct paths to your samples)
-kick_sample = AudioSegment.from_wav("kick.wav")
-snare_sample = AudioSegment.from_wav("snare.wav")
-hihat_sample = AudioSegment.from_wav("hihat.wav")
-clap_sample = AudioSegment.from_wav("clap.wav")
-cowbell_sample = AudioSegment.from_wav("cowbell.wav")  # New sample for phonk style
+kick_sample = AudioSegment.from_wav("./AudioSample/kick.wav")
+snare_sample = AudioSegment.from_wav("./AudioSample/snare.wav")
+hihat_sample = AudioSegment.from_wav("./AudioSample/hihat.wav")
+clap_sample = AudioSegment.from_wav("./AudioSample/clap.wav")
+cowbell_sample = AudioSegment.from_wav("./AudioSample/cowbell.wav")
 
-# Create a more authentic phonk bassline
+# Create a more complex phonk bassline
 def create_phonk_bassline():
-    # Phonk often uses minor scales and repetitive, hypnotic patterns
     base_freq = 55  # A1 note
     minor_scale = [0, 3, 5, 7, 10, 12]  # Minor scale intervals
-    
+
     bassline = AudioSegment.silent(duration=0)
-    pattern = [0, 0, 5, 3, 0, 0, 7, 5]  # Example phonk-style pattern
-    
+    # Extended and complex pattern without gaps
+    pattern = [0, 3, 5, 7, 5, 7, 10, 12, 10, 7, 5, 3, 0, 7, 10, 12]  # Longer and varied sequence
+
     for interval in pattern:
         freq = base_freq * (2 ** (interval / 12))
-        bass_wave = generate_sine_wave(frequency=freq, duration=0.125)  # 125ms per note for that quick, bouncy feel
+        bass_wave = generate_sine_wave(frequency=freq, duration=0.125)  # 125ms per note for continuous flow
         bass = numpy_to_audiosegment(bass_wave)
         bass = bass + 10  # Increase bass volume
         bass = apply_distortion(bass, gain=25, mix=0.9)  # Heavy distortion
         bassline += bass
-    
+
     return normalize(bassline)
 
 # Function to create an authentic phonk drum pattern
@@ -91,8 +90,8 @@ def create_phonk_loop():
     bassline = create_phonk_bassline()
     drum_pattern = create_phonk_drum_pattern()
     
-    # Layer the bassline and drum pattern with slight offset for groove
-    phonk_loop = bassline.overlay(drum_pattern, position=20)
+    # Layer the bassline and drum pattern with no offset for a seamless loop
+    phonk_loop = bassline.overlay(drum_pattern, position=0)  # No offset
     return phonk_loop
 
 # Create a full phonk track with structure
@@ -101,10 +100,10 @@ def create_phonk_track():
     
     main_loop = create_phonk_loop() * 4
     
-    # Create variation by removing bass occasionally
-    variation = create_phonk_drum_pattern() * 2 + create_phonk_loop() * 2
+    # Create variation by changing bass pattern occasionally
+    variation = create_phonk_drum_pattern() * 2 + create_phonk_bassline() * 2
     
-    bridge = (create_phonk_bassline() * 4).overlay(create_phonk_drum_pattern() * 2)
+    bridge = (create_phonk_bassline() * 2).overlay(create_phonk_drum_pattern() * 2)
     
     outro = create_phonk_loop() * 2 + create_phonk_drum_pattern()
 
@@ -128,4 +127,4 @@ authentic_phonk_track = create_phonk_track()
 play(authentic_phonk_track)
 
 # Export the track to a wav file
-authentic_phonk_track.export("authentic_phonk_track.wav", format="wav")
+authentic_phonk_track.export("./output/authentic_phonk_track3.wav", format="wav")
